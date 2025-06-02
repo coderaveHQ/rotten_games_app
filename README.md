@@ -67,28 +67,6 @@ Rotten Games is a web-based collection of addictive "brain rot" games designed t
 - **Fonts:** Google Fonts (Press Start 2P, Inter)
 - **Deployment:** Netlify with automatic GitHub deployments
 
-## 🚀 Quick Start
-
-### Running Locally
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/rotten-games-app.git
-   cd rotten-games-app
-   ```
-
-2. **Open in browser:**
-   ```bash
-   # Option 1: Simple file opening
-   open index.html
-   
-   # Option 2: Local server (recommended)
-   python -m http.server 8000
-   # Then visit: http://localhost:8000
-   ```
-
-3. **Start playing!** 🎮
-
 ### File Structure
 ```
 rotten-games-app/
@@ -97,47 +75,6 @@ rotten-games-app/
 ├── script.js           # Game logic and state management
 └── README.md           # This file
 ```
-
-## 🌐 Deployment
-
-### Deploy to Netlify (Recommended)
-
-1. **Push to GitHub:**
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
-
-2. **Connect to Netlify:**
-   - Login to [Netlify](https://netlify.com)
-   - Click "Add new site" → "Import an existing project"
-   - Choose GitHub and select your repository
-   - Deploy settings: Leave all fields empty (static site)
-   - Click "Deploy site"
-
-3. **Add Custom Domain (Optional):**
-   - Go to "Domain settings" in your Netlify dashboard
-   - Add your custom domain
-   - Configure DNS records as shown by Netlify
-   - Enable HTTPS (automatic)
-
-4. **Automatic Updates:**
-   - Every push to `main` branch automatically deploys
-   - Live in ~30 seconds after pushing code
-
-### Alternative Deployment Options
-- **Vercel:** Zero-config deployment with GitHub integration
-- **GitHub Pages:** Free hosting for public repositories
-- **Cloudflare Pages:** Fast global CDN deployment
-
-## 🎯 Game Development Details
-
-### Performance Optimizations
-- **Efficient animations** using `requestAnimationFrame`
-- **Event delegation** for better memory management
-- **Optimized DOM updates** to prevent layout thrashing
-- **Mobile-optimized** touch events and responsive scaling
 
 ### Browser Compatibility
 - ✅ **Chrome 88+**
@@ -161,12 +98,6 @@ Want to add more brain rot games? Here's how:
    - Add mobile responsiveness
 4. **Submit a pull request**
 
-### Game Ideas to Implement
-- 🫧 **Bubble Wrap Popper:** Click bubbles for satisfying pops
-- 💆 **Stress Ball Squisher:** Squeeze and release for relaxation
-- 🐱 **Cat Collector:** Collect cats with different rarities
-- 🖥️ **Desktop Pet:** Virtual pet that reacts to clicks
-
 ## 📈 Analytics & Performance
 
 ### Loading Performance
@@ -185,13 +116,6 @@ Want to add more brain rot games? Here's how:
 
 ### Current Known Issues
 - None! 🎉 (Please report any bugs you find)
-
-### Roadmap
-- [ ] **Sound effects** for enhanced brain rot experience
-- [ ] **Local storage** to save progress between sessions
-- [ ] **Achievements system** with unlockable rewards
-- [ ] **Multiplayer modes** for competitive brain rot
-- [ ] **PWA support** for mobile app-like experience
 
 ## 📄 License
 
