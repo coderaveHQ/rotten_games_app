@@ -168,6 +168,12 @@ function initBorderGame() {
     // Hide score display
     document.getElementById('score-display').classList.add('hidden');
     
+    // Remove any existing event listeners to prevent duplicates
+    canvas.removeEventListener('mousedown', startDrawing);
+    canvas.removeEventListener('mousemove', continueDrawing);
+    canvas.removeEventListener('mouseup', finishDrawing);
+    canvas.removeEventListener('mouseleave', finishDrawing);
+    
     // Add event listeners
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', continueDrawing);
@@ -183,9 +189,15 @@ function startDrawing(event) {
     gameState.borderGame.startX = event.clientX - rect.left;
     gameState.borderGame.startY = event.clientY - rect.top;
     
+    // Add selecting class for cursor change
+    canvas.classList.add('selecting');
+    
     // Clear previous rectangle
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Prevent text selection during drawing
+    event.preventDefault();
 }
 
 function continueDrawing(event) {
@@ -204,11 +216,8 @@ function continueDrawing(event) {
     const width = currentX - gameState.borderGame.startX;
     const height = currentY - gameState.borderGame.startY;
     
-    // Draw rectangle
-    ctx.strokeStyle = '#ff6b6b';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(gameState.borderGame.startX, gameState.borderGame.startY, width, height);
+    // Draw Windows-style selection rectangle
+    drawWindowsSelectionRect(ctx, gameState.borderGame.startX, gameState.borderGame.startY, width, height);
     
     // Store current rectangle
     gameState.borderGame.currentRect = {
@@ -219,13 +228,35 @@ function continueDrawing(event) {
     };
 }
 
+function drawWindowsSelectionRect(ctx, x, y, width, height) {
+    // Windows-style selection rectangle
+    // Fill with semi-transparent blue (Windows 10/11 selection color)
+    ctx.fillStyle = 'rgba(0, 120, 215, 0.3)';
+    ctx.fillRect(x, y, width, height);
+    
+    // Draw solid border like native Windows (not dotted)
+    ctx.strokeStyle = '#0078d7'; // Windows blue
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]); // Solid line, not dotted
+    ctx.strokeRect(x, y, width, height);
+}
+
 function finishDrawing() {
     if (!gameState.borderGame.isDrawing) return;
     
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
     gameState.borderGame.isDrawing = false;
     
+    // Remove selecting class
+    canvas.classList.remove('selecting');
+    
     if (gameState.borderGame.currentRect) {
+        // Calculate score first
         calculateScore();
+        
+        // Clear the selection immediately like Windows
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 }
 
@@ -268,13 +299,6 @@ function calculateScore() {
     const message = getScoreMessage(score);
     document.getElementById('score-message').textContent = message;
     document.getElementById('score-display').classList.remove('hidden');
-    
-    // Draw perfect rectangle for comparison
-    const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#00ff00';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([]);
-    ctx.strokeRect(perfectRect.x, perfectRect.y, perfectRect.width, perfectRect.height);
 }
 
 function calculateRectangleAccuracy(userRect, perfectRect) {

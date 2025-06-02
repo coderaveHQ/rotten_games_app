@@ -340,13 +340,34 @@ body {
     padding: 30px;
 }
 
-#game-canvas {
+/* Add a background layer for the canvas area */
+.canvas-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 600px;
+    background: #f0f0f0;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 15px;
-    background: #f0f0f0;
-    cursor: crosshair;
-    position: relative;
     z-index: 1;
+}
+
+#game-canvas {
+    border: 2px solid transparent;
+    border-radius: 15px;
+    background: transparent;
+    position: relative;
+    z-index: 3;
+    /* Windows-style selection cursor */
+    cursor: crosshair;
+}
+
+/* Windows selection area styling */
+#game-canvas.selecting {
+    cursor: crosshair;
 }
 
 .windows-logo {
@@ -356,24 +377,50 @@ body {
     transform: translate(-50%, -50%);
     z-index: 2;
     pointer-events: none;
+    /* Make the logo much bigger */
+    transform: translate(-50%, -50%) scale(2.5);
 }
 
 .logo-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    width: 60px;
-    height: 60px;
+    gap: 3px;
+    width: 80px;
+    height: 80px;
+    /* Add subtle shadow for depth like Windows */
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .logo-square {
-    border-radius: 2px;
+    border-radius: 3px;
+    /* Add subtle gradient like real Windows logo */
+    position: relative;
 }
 
-.logo-square.red { background: #f65314; }
-.logo-square.green { background: #7cbb00; }
-.logo-square.blue { background: #00a1f1; }
-.logo-square.yellow { background: #ffbb00; }
+.logo-square::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.1));
+    pointer-events: none;
+}
+
+.logo-square.red { 
+    background: linear-gradient(135deg, #f65314, #d43d07);
+}
+.logo-square.green { 
+    background: linear-gradient(135deg, #7cbb00, #5e9c00);
+}
+.logo-square.blue { 
+    background: linear-gradient(135deg, #00a1f1, #0078c7);
+}
+.logo-square.yellow { 
+    background: linear-gradient(135deg, #ffbb00, #e6a600);
+}
 
 .game-controls {
     display: flex;
@@ -502,5 +549,17 @@ body {
     .game-stats {
         flex-direction: column;
         gap: 15px;
+    }
+    
+    /* Scale down logo on mobile */
+    .windows-logo {
+        transform: translate(-50%, -50%) scale(1.8);
+    }
+    
+    /* Adjust background size for mobile */
+    .canvas-container::before {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
     }
 } 
