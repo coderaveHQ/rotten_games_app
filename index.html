@@ -31,6 +31,12 @@
                         <h3>Logo Border Challenge</h3>
                         <p>Draw perfect rectangles around the Windows logo</p>
                     </div>
+                    
+                    <div class="game-card" onclick="startGame('progress-bar')">
+                        <div class="game-icon">📊</div>
+                        <h3>Progress Bar Filler</h3>
+                        <p>Fill progress bars and unlock more. Pure satisfaction.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,6 +146,70 @@
                         <h3>Your Score</h3>
                         <div class="score-value" id="current-score">0%</div>
                         <p class="score-message" id="score-message"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar Filler Game -->
+        <div id="progress-bar" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <button class="back-btn" onclick="showMainMenu()">← Back</button>
+                    <h2>Progress Bar Filler</h2>
+                </div>
+                
+                <div class="progress-game">
+                    <div class="progress-stats">
+                        <div class="stat">
+                            <span class="stat-label">Bars Completed:</span>
+                            <span id="bars-completed" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Active Bars:</span>
+                            <span id="active-bars" class="stat-value">1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Click Power:</span>
+                            <span id="progress-click-power" class="stat-value">1%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p>Click progress bars to fill them faster! Complete bars to unlock new ones and increase your power!</p>
+                    </div>
+                    
+                    <div class="progress-container" id="progress-container">
+                        <!-- Progress bars will be dynamically generated here -->
+                    </div>
+                    
+                    <div class="progress-upgrades">
+                        <h3>Upgrades</h3>
+                        <div class="upgrade-list">
+                            <button class="upgrade-btn" id="speed-upgrade" onclick="buyProgressUpgrade('speed')">
+                                <div class="upgrade-info">
+                                    <span class="upgrade-name">Speed Boost</span>
+                                    <span class="upgrade-desc">+50% fill speed</span>
+                                </div>
+                                <span class="upgrade-cost">3 completions</span>
+                            </button>
+                            
+                            <button class="upgrade-btn" id="power-upgrade" onclick="buyProgressUpgrade('power')">
+                                <div class="upgrade-info">
+                                    <span class="upgrade-name">Click Power</span>
+                                    <span class="upgrade-desc">+1% per click</span>
+                                </div>
+                                <span class="upgrade-cost">5 completions</span>
+                            </button>
+                            
+                            <button class="upgrade-btn" id="multi-upgrade" onclick="buyProgressUpgrade('multi')">
+                                <div class="upgrade-info">
+                                    <span class="upgrade-name">Multi Bar</span>
+                                    <span class="upgrade-desc">+1 active bar</span>
+                                </div>
+                                <span class="upgrade-cost">10 completions</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
