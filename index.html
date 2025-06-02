@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotten Games - Brain Rot Paradise</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen active">
+            <div class="container">
+                <header class="header">
+                    <h1 class="title">🧠 Rotten Games</h1>
+                    <p class="subtitle">Brain Rot Paradise - Choose Your Poison</p>
+                </header>
+                
+                <div class="game-grid">
+                    <div class="game-card" onclick="startGame('cookie-clicker')">
+                        <div class="game-icon">🍪</div>
+                        <h3>Cookie Clicker</h3>
+                        <p>Click cookies, get points, become addicted</p>
+                    </div>
+                    
+                    <div class="game-card" onclick="startGame('logo-border')">
+                        <div class="game-icon">🎯</div>
+                        <h3>Logo Border Challenge</h3>
+                        <p>Draw perfect rectangles around the Windows logo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cookie Clicker Game -->
+        <div id="cookie-clicker" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <button class="back-btn" onclick="showMainMenu()">← Back</button>
+                    <h2>Cookie Clicker</h2>
+                </div>
+                
+                <div class="cookie-game">
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-label">Cookies:</span>
+                            <span id="cookie-count" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Per Click:</span>
+                            <span id="click-power" class="stat-value">1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">CPS:</span>
+                            <span id="cookies-per-second" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cookie-container">
+                        <button id="cookie-btn" class="cookie-btn">🍪</button>
+                        <div id="click-effect" class="click-effect"></div>
+                    </div>
+                    
+                    <div class="upgrades">
+                        <h3>Upgrades</h3>
+                        <div class="upgrade-list">
+                            <button class="upgrade-btn" id="cursor-upgrade" onclick="buyUpgrade('cursor')">
+                                <div class="upgrade-info">
+                                    <span class="upgrade-name">Cursor</span>
+                                    <span class="upgrade-desc">+1 cookie per click</span>
+                                </div>
+                                <span class="upgrade-cost">15 cookies</span>
+                            </button>
+                            
+                            <button class="upgrade-btn" id="grandma-upgrade" onclick="buyUpgrade('grandma')">
+                                <div class="upgrade-info">
+                                    <span class="upgrade-name">Grandma</span>
+                                    <span class="upgrade-desc">+1 cookie per second</span>
+                                </div>
+                                <span class="upgrade-cost">100 cookies</span>
+                            </button>
+                            
+                            <button class="upgrade-btn" id="factory-upgrade" onclick="buyUpgrade('factory')">
+                                <div class="upgrade-info">
+                                    <span class="upgrade-name">Factory</span>
+                                    <span class="upgrade-desc">+8 cookies per second</span>
+                                </div>
+                                <span class="upgrade-cost">1200 cookies</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Border Game -->
+        <div id="logo-border" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <button class="back-btn" onclick="showMainMenu()">← Back</button>
+                    <h2>Logo Border Challenge</h2>
+                </div>
+                
+                <div class="border-game">
+                    <div class="game-stats">
+                        <div class="stat">
+                            <span class="stat-label">Best Score:</span>
+                            <span id="best-score" class="stat-value">0%</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Last Score:</span>
+                            <span id="last-score" class="stat-value">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p>Click and drag to draw a rectangle around the Windows logo as precisely as possible!</p>
+                    </div>
+                    
+                    <div id="game-canvas-container" class="canvas-container">
+                        <canvas id="game-canvas" width="800" height="600"></canvas>
+                        <div class="windows-logo">
+                            <div class="logo-grid">
+                                <div class="logo-square red"></div>
+                                <div class="logo-square green"></div>
+                                <div class="logo-square blue"></div>
+                                <div class="logo-square yellow"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <button id="reset-game" class="game-btn" onclick="resetBorderGame()">Try Again</button>
+                    </div>
+                    
+                    <div id="score-display" class="score-display hidden">
+                        <h3>Your Score</h3>
+                        <div class="score-value" id="current-score">0%</div>
+                        <p class="score-message" id="score-message"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
