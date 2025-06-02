@@ -37,6 +37,12 @@
                         <h3>Progress Bar Filler</h3>
                         <p>Fill progress bars and unlock more. Pure satisfaction.</p>
                     </div>
+                    
+                    <div class="game-card" onclick="startGame('dvd-bouncer')">
+                        <div class="game-icon">📺</div>
+                        <h3>DVD Logo Bouncer</h3>
+                        <p>Hit the DVD logo to make it bounce into the corner!</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,6 +216,62 @@
                                 <span class="upgrade-cost">10 completions</span>
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DVD Logo Bouncer Game -->
+        <div id="dvd-bouncer" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <button class="back-btn" onclick="showMainMenu()">← Back</button>
+                    <h2>DVD Logo Bouncer</h2>
+                </div>
+                
+                <div class="dvd-game">
+                    <div class="dvd-stats">
+                        <div class="stat">
+                            <span class="stat-label">Corner Hits:</span>
+                            <span id="corner-hits" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Total Bounces:</span>
+                            <span id="total-bounces" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Best Streak:</span>
+                            <span id="best-streak" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p>Use your mouse to move the paddle! Hit the DVD logo at the right angle to make it bounce into the corner perfectly!</p>
+                    </div>
+                    
+                    <div class="dvd-game-area" id="dvd-game-area">
+                        <div class="paddle" id="paddle"></div>
+                        <div class="dvd-logo" id="dvd-logo">
+                            <div class="dvd-text">DVD</div>
+                        </div>
+                        <div class="corner-indicators">
+                            <div class="corner-indicator top-left"></div>
+                            <div class="corner-indicator top-right"></div>
+                            <div class="corner-indicator bottom-left"></div>
+                            <div class="corner-indicator bottom-right"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <button id="reset-dvd-game" class="game-btn" onclick="resetDVDGame()">Reset Game</button>
+                        <button id="pause-dvd-game" class="game-btn" onclick="toggleDVDGame()">Pause</button>
+                    </div>
+                    
+                    <div id="dvd-success-display" class="score-display hidden">
+                        <h3>🎉 CORNER HIT! 🎉</h3>
+                        <div class="score-value" id="dvd-success-message">Perfect angle!</div>
+                        <p class="score-message">The DVD logo hit the corner exactly! That's the dream!</p>
+                        <button class="game-btn" onclick="continueAfterCornerHit()">Try Again</button>
                     </div>
                 </div>
             </div>

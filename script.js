@@ -30,6 +30,32 @@ let gameState = {
             power: { owned: 0, cost: 5 },
             multi: { owned: 0, cost: 10 }
         }
+    },
+    dvdGame: {
+        cornerHits: 0,
+        totalBounces: 0,
+        bestStreak: 0,
+        currentStreak: 0,
+        isPlaying: false,
+        isPaused: false,
+        dvd: {
+            x: 400,
+            y: 250,
+            width: 80,
+            height: 50,
+            velocityX: 5,
+            velocityY: 3
+        },
+        paddle: {
+            x: 20,
+            y: 210,
+            width: 15,
+            height: 80
+        },
+        gameArea: {
+            width: 800,
+            height: 500
+        }
     }
 };
 
@@ -46,10 +72,19 @@ function showScreen(screenId) {
         initBorderGame();
     } else if (screenId === 'progress-bar') {
         initProgressGame();
+    } else if (screenId === 'dvd-bouncer') {
+        initDVDGame();
     }
 }
 
 function showMainMenu() {
+    // Stop DVD game if running
+    if (gameState.dvdGame.isPlaying) {
+        gameState.dvdGame.isPlaying = false;
+        if (gameState.dvdGame.animationId) {
+            cancelAnimationFrame(gameState.dvdGame.animationId);
+        }
+    }
     showScreen('main-menu');
 }
 
@@ -630,6 +665,255 @@ function updateProgressUpgradeButtons() {
             button.style.opacity = '0.5';
         }
     });
+}
+
+// DVD Logo Bouncer Game Logic
+function initDVDGame() {
+    const dvdState = gameState.dvdGame;
+    
+    // Reset DVD position and velocity with randomization
+    const gameAreaDimensions = dvdState.gameArea;
+    const dvdWidth = dvdState.dvd.width;
+    const dvdHeight = dvdState.dvd.height;
+    
+    // Random starting position (avoid edges and corners)
+    dvdState.dvd.x = 200 + Math.random() * (gameAreaDimensions.width - dvdWidth - 300);
+    dvdState.dvd.y = 50 + Math.random() * (gameAreaDimensions.height - dvdHeight - 100);
+    
+    // Random starting velocity direction and speed
+    const baseSpeed = 4;
+    const speedVariation = 2;
+    dvdState.dvd.velocityX = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
+    dvdState.dvd.velocityY = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
+    
+    // Reset paddle position
+    dvdState.paddle.y = 210;
+    
+    // Update display
+    updateDVDDisplay();
+    
+    // Set up mouse movement for paddle
+    const gameArea = document.getElementById('dvd-game-area');
+    gameArea.addEventListener('mousemove', updatePaddlePosition);
+    
+    // Hide success display
+    document.getElementById('dvd-success-display').classList.add('hidden');
+    
+    // Start game loop
+    dvdState.isPlaying = true;
+    dvdState.isPaused = false;
+    updateDVDGame();
+}
+
+function updatePaddlePosition(event) {
+    if (!gameState.dvdGame.isPlaying || gameState.dvdGame.isPaused) return;
+    
+    const gameArea = document.getElementById('dvd-game-area');
+    const paddle = document.getElementById('paddle');
+    const rect = gameArea.getBoundingClientRect();
+    
+    const mouseY = event.clientY - rect.top;
+    const paddleHeight = gameState.dvdGame.paddle.height;
+    const gameHeight = gameState.dvdGame.gameArea.height;
+    
+    // Keep paddle within game area
+    let newY = mouseY - paddleHeight / 2;
+    newY = Math.max(0, Math.min(newY, gameHeight - paddleHeight));
+    
+    gameState.dvdGame.paddle.y = newY;
+    paddle.style.top = newY + 'px';
+}
+
+function updateDVDGame() {
+    if (!gameState.dvdGame.isPlaying) return;
+    
+    if (!gameState.dvdGame.isPaused) {
+        updateDVDPosition();
+        checkCollisions();
+        checkCornerHit();
+        renderDVDPosition();
+    }
+    
+    gameState.dvdGame.animationId = requestAnimationFrame(updateDVDGame);
+}
+
+function updateDVDPosition() {
+    const dvd = gameState.dvdGame.dvd;
+    const gameArea = gameState.dvdGame.gameArea;
+    
+    // Update position
+    dvd.x += dvd.velocityX;
+    dvd.y += dvd.velocityY;
+    
+    // Bounce off top and bottom walls
+    if (dvd.y <= 0 || dvd.y >= gameArea.height - dvd.height) {
+        dvd.velocityY = -dvd.velocityY;
+        dvd.y = Math.max(0, Math.min(dvd.y, gameArea.height - dvd.height));
+        gameState.dvdGame.totalBounces++;
+        updateDVDDisplay();
+    }
+    
+    // Bounce off right wall
+    if (dvd.x >= gameArea.width - dvd.width) {
+        dvd.velocityX = -dvd.velocityX;
+        dvd.x = gameArea.width - dvd.width;
+        gameState.dvdGame.totalBounces++;
+        updateDVDDisplay();
+    }
+    
+    // Reset if DVD goes off left side (missed by paddle)
+    if (dvd.x < 0) {
+        resetDVDPosition();
+        gameState.dvdGame.currentStreak = 0;
+    }
+}
+
+function checkCollisions() {
+    const dvd = gameState.dvdGame.dvd;
+    const paddle = gameState.dvdGame.paddle;
+    
+    // Check collision with paddle
+    if (dvd.x <= paddle.x + paddle.width &&
+        dvd.x + dvd.width >= paddle.x &&
+        dvd.y <= paddle.y + paddle.height &&
+        dvd.y + dvd.height >= paddle.y &&
+        dvd.velocityX < 0) {
+        
+        // Calculate bounce angle based on where it hits the paddle
+        const hitPosition = (dvd.y + dvd.height / 2) - (paddle.y + paddle.height / 2);
+        const normalizedHit = hitPosition / (paddle.height / 2);
+        
+        // Reverse X direction and adjust Y direction based on hit position
+        dvd.velocityX = Math.abs(dvd.velocityX);
+        dvd.velocityY = normalizedHit * 4; // Max 4 pixels per frame vertical speed
+        
+        // Ensure minimum horizontal speed
+        if (Math.abs(dvd.velocityX) < 4) {
+            dvd.velocityX = 4;
+        }
+        
+        // Move DVD away from paddle to prevent sticking
+        dvd.x = paddle.x + paddle.width;
+        
+        // Add visual feedback
+        const paddleElement = document.getElementById('paddle');
+        paddleElement.classList.add('hit');
+        setTimeout(() => paddleElement.classList.remove('hit'), 300);
+        
+        gameState.dvdGame.totalBounces++;
+        gameState.dvdGame.currentStreak++;
+        updateDVDDisplay();
+    }
+}
+
+function checkCornerHit() {
+    const dvd = gameState.dvdGame.dvd;
+    const gameArea = gameState.dvdGame.gameArea;
+    const tolerance = 5; // Pixel tolerance for corner hits
+    
+    const corners = [
+        { x: 0, y: 0, class: 'top-left' },
+        { x: gameArea.width - dvd.width, y: 0, class: 'top-right' },
+        { x: 0, y: gameArea.height - dvd.height, class: 'bottom-left' },
+        { x: gameArea.width - dvd.width, y: gameArea.height - dvd.height, class: 'bottom-right' }
+    ];
+    
+    corners.forEach(corner => {
+        if (Math.abs(dvd.x - corner.x) <= tolerance && Math.abs(dvd.y - corner.y) <= tolerance) {
+            // Corner hit!
+            cornerHitSuccess(corner.class);
+        }
+    });
+}
+
+function cornerHitSuccess(cornerClass) {
+    gameState.dvdGame.cornerHits++;
+    if (gameState.dvdGame.currentStreak > gameState.dvdGame.bestStreak) {
+        gameState.dvdGame.bestStreak = gameState.dvdGame.currentStreak;
+    }
+    
+    // Visual effects
+    const cornerIndicator = document.querySelector(`.corner-indicator.${cornerClass}`);
+    cornerIndicator.classList.add('hit');
+    
+    const dvdElement = document.getElementById('dvd-logo');
+    dvdElement.classList.add('corner-hit');
+    
+    // Show success message
+    document.getElementById('dvd-success-display').classList.remove('hidden');
+    
+    // Pause game
+    gameState.dvdGame.isPaused = true;
+    
+    updateDVDDisplay();
+    
+    // Remove visual effects after animation
+    setTimeout(() => {
+        cornerIndicator.classList.remove('hit');
+        dvdElement.classList.remove('corner-hit');
+    }, 1000);
+}
+
+function renderDVDPosition() {
+    const dvdElement = document.getElementById('dvd-logo');
+    const dvd = gameState.dvdGame.dvd;
+    
+    dvdElement.style.left = dvd.x + 'px';
+    dvdElement.style.top = dvd.y + 'px';
+}
+
+function resetDVDPosition() {
+    const dvd = gameState.dvdGame.dvd;
+    const gameAreaDimensions = gameState.dvdGame.gameArea;
+    
+    // Random starting position (avoid edges and corners)
+    dvd.x = 200 + Math.random() * (gameAreaDimensions.width - dvd.width - 300);
+    dvd.y = 50 + Math.random() * (gameAreaDimensions.height - dvd.height - 100);
+    
+    // Random starting velocity direction and speed
+    const baseSpeed = 4;
+    const speedVariation = 2;
+    dvd.velocityX = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
+    dvd.velocityY = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
+}
+
+function updateDVDDisplay() {
+    document.getElementById('corner-hits').textContent = gameState.dvdGame.cornerHits;
+    document.getElementById('total-bounces').textContent = gameState.dvdGame.totalBounces;
+    document.getElementById('best-streak').textContent = gameState.dvdGame.bestStreak;
+}
+
+function resetDVDGame() {
+    gameState.dvdGame.cornerHits = 0;
+    gameState.dvdGame.totalBounces = 0;
+    gameState.dvdGame.bestStreak = 0;
+    gameState.dvdGame.currentStreak = 0;
+    
+    document.getElementById('dvd-success-display').classList.add('hidden');
+    
+    initDVDGame();
+}
+
+function toggleDVDGame() {
+    const gameArea = document.getElementById('dvd-game-area');
+    const pauseBtn = document.getElementById('pause-dvd-game');
+    
+    if (gameState.dvdGame.isPaused) {
+        gameState.dvdGame.isPaused = false;
+        gameArea.classList.remove('paused');
+        pauseBtn.textContent = 'Pause';
+    } else {
+        gameState.dvdGame.isPaused = true;
+        gameArea.classList.add('paused');
+        pauseBtn.textContent = 'Resume';
+    }
+}
+
+function continueAfterCornerHit() {
+    document.getElementById('dvd-success-display').classList.add('hidden');
+    resetDVDPosition();
+    gameState.dvdGame.isPaused = false;
+    gameState.dvdGame.currentStreak = 0;
 }
 
 // Initialize the app
