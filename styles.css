@@ -834,6 +834,21 @@ body {
         max-width: 200px;
         margin: 0 auto;
     }
+    
+    /* Footer mobile styles */
+    .footer {
+        margin-top: 40px;
+        padding: 20px 0;
+    }
+    
+    .footer-text {
+        font-size: 0.9rem;
+        padding: 0 10px;
+    }
+    
+    .heart {
+        font-size: 1.1rem;
+    }
 }
 
 /* DVD Logo Bouncer Game Styles */
@@ -1059,4 +1074,85 @@ body {
 @keyframes pauseBlink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
+}
+
+/* Footer Styles */
+.footer {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px 0;
+    margin-top: 60px;
+    position: relative;
+}
+
+.footer-text {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.heart {
+    color: #ff4757;
+    font-size: 1.2rem;
+    display: inline-block;
+    animation: heartbeat 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.6));
+}
+
+@keyframes heartbeat {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    14% { 
+        transform: scale(1.2); 
+    }
+    28% { 
+        transform: scale(1); 
+    }
+    42% { 
+        transform: scale(1.2); 
+    }
+    56% { 
+        transform: scale(1); 
+    }
+}
+
+.coderave-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.coderave-link::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+    border-radius: 1px;
+}
+
+.coderave-link:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+}
+
+.coderave-link:hover::before {
+    width: 100%;
+}
+
+.coderave-link:active {
+    transform: translateY(0);
 } 
