@@ -43,8 +43,8 @@ let gameState = {
             y: 250,
             width: 80,
             height: 50,
-            velocityX: 5,
-            velocityY: 3
+            velocityX: 7,
+            velocityY: 7
         },
         paddle: {
             x: 20,
@@ -680,11 +680,11 @@ function initDVDGame() {
     dvdState.dvd.x = 200 + Math.random() * (gameAreaDimensions.width - dvdWidth - 300);
     dvdState.dvd.y = 50 + Math.random() * (gameAreaDimensions.height - dvdHeight - 100);
     
-    // Random starting velocity direction and speed
-    const baseSpeed = 4;
-    const speedVariation = 2;
-    dvdState.dvd.velocityX = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
-    dvdState.dvd.velocityY = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
+    // Consistent starting velocity with random direction
+    const speed = 7; // Constant speed throughout the game - increased for faster gameplay
+    const angle = Math.random() * 2 * Math.PI; // Random angle
+    dvdState.dvd.velocityX = Math.cos(angle) * speed;
+    dvdState.dvd.velocityY = Math.sin(angle) * speed;
     
     // Reset paddle position
     dvdState.paddle.y = 210;
@@ -692,8 +692,9 @@ function initDVDGame() {
     // Update display
     updateDVDDisplay();
     
-    // Set up mouse movement for paddle
+    // Set up mouse movement for paddle (remove existing listener first)
     const gameArea = document.getElementById('dvd-game-area');
+    gameArea.removeEventListener('mousemove', updatePaddlePosition);
     gameArea.addEventListener('mousemove', updatePaddlePosition);
     
     // Hide success display
@@ -783,14 +784,13 @@ function checkCollisions() {
         const hitPosition = (dvd.y + dvd.height / 2) - (paddle.y + paddle.height / 2);
         const normalizedHit = hitPosition / (paddle.height / 2);
         
-        // Reverse X direction and adjust Y direction based on hit position
-        dvd.velocityX = Math.abs(dvd.velocityX);
-        dvd.velocityY = normalizedHit * 4; // Max 4 pixels per frame vertical speed
+        // Calculate new velocity direction
+        const speed = 7; // Constant speed - increased for faster gameplay
+        const angle = normalizedHit * Math.PI / 3; // Max 60 degrees up or down
         
-        // Ensure minimum horizontal speed
-        if (Math.abs(dvd.velocityX) < 4) {
-            dvd.velocityX = 4;
-        }
+        // Set new velocity maintaining constant speed
+        dvd.velocityX = Math.cos(angle) * speed;
+        dvd.velocityY = Math.sin(angle) * speed;
         
         // Move DVD away from paddle to prevent sticking
         dvd.x = paddle.x + paddle.width;
@@ -870,11 +870,11 @@ function resetDVDPosition() {
     dvd.x = 200 + Math.random() * (gameAreaDimensions.width - dvd.width - 300);
     dvd.y = 50 + Math.random() * (gameAreaDimensions.height - dvd.height - 100);
     
-    // Random starting velocity direction and speed
-    const baseSpeed = 4;
-    const speedVariation = 2;
-    dvd.velocityX = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
-    dvd.velocityY = (Math.random() > 0.5 ? 1 : -1) * (baseSpeed + Math.random() * speedVariation);
+    // Consistent starting velocity with random direction
+    const speed = 7; // Constant speed throughout the game - increased for faster gameplay
+    const angle = Math.random() * 2 * Math.PI; // Random angle
+    dvd.velocityX = Math.cos(angle) * speed;
+    dvd.velocityY = Math.sin(angle) * speed;
 }
 
 function updateDVDDisplay() {
@@ -884,6 +884,15 @@ function updateDVDDisplay() {
 }
 
 function resetDVDGame() {
+    // Stop the current animation loop first
+    if (gameState.dvdGame.isPlaying) {
+        gameState.dvdGame.isPlaying = false;
+        if (gameState.dvdGame.animationId) {
+            cancelAnimationFrame(gameState.dvdGame.animationId);
+        }
+    }
+    
+    // Reset stats
     gameState.dvdGame.cornerHits = 0;
     gameState.dvdGame.totalBounces = 0;
     gameState.dvdGame.bestStreak = 0;
@@ -891,6 +900,7 @@ function resetDVDGame() {
     
     document.getElementById('dvd-success-display').classList.add('hidden');
     
+    // Start fresh game
     initDVDGame();
 }
 
