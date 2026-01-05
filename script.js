@@ -31,6 +31,33 @@ let gameState = {
             multi: { owned: 0, cost: 10 }
         }
     },
+    stayInDotGame: {
+        score: 0,
+        highScore: 0,
+        isRunning: false,
+        isActive: false,
+        lastUpdate: 0,
+        pointsPerSecond: 10,
+        status: 'Hover the dot to start',
+        dot: {
+            x: 0,
+            y: 0,
+            radius: 35,
+            speed: 60,
+            velocityX: 60,
+            velocityY: 60
+        },
+        mouse: {
+            x: -999,
+            y: -999
+        },
+        area: {
+            width: 800,
+            height: 500
+        },
+        animationId: null,
+        hasResizeListener: false
+    },
     dvdGame: {
         cornerHits: 0,
         totalBounces: 0,
@@ -72,6 +99,8 @@ function showScreen(screenId) {
         initBorderGame();
     } else if (screenId === 'progress-bar') {
         initProgressGame();
+    } else if (screenId === 'stay-in-dot') {
+        initStayInDotGame();
     } else if (screenId === 'dvd-bouncer') {
         initDVDGame();
     }
@@ -84,6 +113,11 @@ function showMainMenu() {
         if (gameState.dvdGame.animationId) {
             cancelAnimationFrame(gameState.dvdGame.animationId);
         }
+    }
+    
+    // Stop stay-in-dot loop if running
+    if (gameState.stayInDotGame.isActive) {
+        stopStayInDotGame();
     }
     showScreen('main-menu');
 }
@@ -665,6 +699,233 @@ function updateProgressUpgradeButtons() {
             button.style.opacity = '0.5';
         }
     });
+}
+
+// Stay In The Dot Game Logic
+function initStayInDotGame() {
+    const state = gameState.stayInDotGame;
+    const area = document.getElementById('dot-game-area');
+    const dot = document.getElementById('dot-target');
+    const message = document.getElementById('dot-message');
+    
+    state.isActive = true;
+    updateStayInDotAreaSize();
+    
+    state.score = 0;
+    state.isRunning = false;
+    state.status = 'Hover the dot to start';
+    state.lastUpdate = performance.now();
+    state.mouse.x = -999;
+    state.mouse.y = -999;
+    
+    centerStayInDot();
+    dot.classList.remove('running');
+    message.textContent = 'Move mouse into the dot to start';
+    updateStayInDotDisplay();
+    
+    area.removeEventListener('mousemove', handleStayInDotMouseMove);
+    area.removeEventListener('mouseleave', handleStayInDotMouseLeave);
+    area.addEventListener('mousemove', handleStayInDotMouseMove);
+    area.addEventListener('mouseleave', handleStayInDotMouseLeave);
+    
+    if (!state.hasResizeListener) {
+        window.addEventListener('resize', handleStayInDotResize);
+        state.hasResizeListener = true;
+    }
+    
+    if (state.animationId) {
+        cancelAnimationFrame(state.animationId);
+    }
+    state.animationId = requestAnimationFrame(updateStayInDotGame);
+}
+
+function handleStayInDotResize() {
+    if (currentGame !== 'stay-in-dot') return;
+    updateStayInDotAreaSize();
+    centerStayInDot();
+}
+
+function updateStayInDotAreaSize() {
+    const state = gameState.stayInDotGame;
+    const area = document.getElementById('dot-game-area');
+    const dot = document.getElementById('dot-target');
+    
+    if (!area || !dot) return;
+    
+    state.area.width = area.clientWidth;
+    state.area.height = area.clientHeight;
+    state.dot.radius = dot.offsetWidth / 2;
+}
+
+function centerStayInDot() {
+    const state = gameState.stayInDotGame;
+    const angle = Math.random() * Math.PI * 2;
+    
+    state.dot.x = state.area.width / 2;
+    state.dot.y = state.area.height / 2;
+    state.dot.velocityX = Math.cos(angle) * state.dot.speed;
+    state.dot.velocityY = Math.sin(angle) * state.dot.speed;
+    
+    renderStayInDotPosition();
+}
+
+function handleStayInDotMouseMove(event) {
+    const state = gameState.stayInDotGame;
+    const area = document.getElementById('dot-game-area');
+    const rect = area.getBoundingClientRect();
+    
+    state.mouse.x = event.clientX - rect.left;
+    state.mouse.y = event.clientY - rect.top;
+    
+    if (!state.isRunning && isMouseInsideDot()) {
+        startStayInDotRun();
+    }
+}
+
+function handleStayInDotMouseLeave() {
+    if (gameState.stayInDotGame.isRunning) {
+        endStayInDotGame(true);
+    }
+}
+
+function isMouseInsideDot() {
+    const state = gameState.stayInDotGame;
+    const dx = state.mouse.x - state.dot.x;
+    const dy = state.mouse.y - state.dot.y;
+    return Math.hypot(dx, dy) <= state.dot.radius;
+}
+
+function startStayInDotRun() {
+    const state = gameState.stayInDotGame;
+    const dot = document.getElementById('dot-target');
+    
+    state.score = 0;
+    state.isRunning = true;
+    state.status = 'Stay inside the dot!';
+    state.lastUpdate = performance.now();
+    dot.classList.add('running');
+    
+    updateStayInDotDisplay();
+}
+
+function endStayInDotGame(wasMissed) {
+    const state = gameState.stayInDotGame;
+    const dot = document.getElementById('dot-target');
+    const message = document.getElementById('dot-message');
+    
+    state.isRunning = false;
+    if (state.score > state.highScore) {
+        state.highScore = Math.floor(state.score);
+    }
+    
+    state.status = wasMissed ? 'Missed! Move into the dot to retry' : 'Hover the dot to start';
+    message.textContent = wasMissed ? 'Missed! Move into the dot to retry' : 'Move mouse into the dot to start';
+    dot.classList.remove('running');
+    
+    centerStayInDot();
+    updateStayInDotDisplay();
+}
+
+function updateStayInDotGame(timestamp) {
+    const state = gameState.stayInDotGame;
+    
+    if (!state.isActive || currentGame !== 'stay-in-dot') return;
+    
+    if (!state.lastUpdate) {
+        state.lastUpdate = timestamp;
+    }
+    
+    const delta = (timestamp - state.lastUpdate) / 1000;
+    state.lastUpdate = timestamp;
+    
+    if (state.isRunning) {
+        const drift = 12;
+        
+        state.dot.velocityX += (Math.random() - 0.5) * drift * delta;
+        state.dot.velocityY += (Math.random() - 0.5) * drift * delta;
+        
+        const speed = Math.hypot(state.dot.velocityX, state.dot.velocityY);
+        if (speed > state.dot.speed) {
+            state.dot.velocityX = (state.dot.velocityX / speed) * state.dot.speed;
+            state.dot.velocityY = (state.dot.velocityY / speed) * state.dot.speed;
+        }
+        
+        state.dot.x += state.dot.velocityX * delta;
+        state.dot.y += state.dot.velocityY * delta;
+        
+        const radius = state.dot.radius;
+        if (state.dot.x <= radius) {
+            state.dot.x = radius;
+            state.dot.velocityX = Math.abs(state.dot.velocityX);
+        } else if (state.dot.x >= state.area.width - radius) {
+            state.dot.x = state.area.width - radius;
+            state.dot.velocityX = -Math.abs(state.dot.velocityX);
+        }
+        
+        if (state.dot.y <= radius) {
+            state.dot.y = radius;
+            state.dot.velocityY = Math.abs(state.dot.velocityY);
+        } else if (state.dot.y >= state.area.height - radius) {
+            state.dot.y = state.area.height - radius;
+            state.dot.velocityY = -Math.abs(state.dot.velocityY);
+        }
+        
+        if (!isMouseInsideDot()) {
+            endStayInDotGame(true);
+        } else {
+            state.score += delta * state.pointsPerSecond;
+            updateStayInDotDisplay();
+        }
+    }
+    
+    renderStayInDotPosition();
+    state.animationId = requestAnimationFrame(updateStayInDotGame);
+}
+
+function renderStayInDotPosition() {
+    const state = gameState.stayInDotGame;
+    const dot = document.getElementById('dot-target');
+    
+    if (!dot) return;
+    
+    dot.style.left = (state.dot.x - state.dot.radius) + 'px';
+    dot.style.top = (state.dot.y - state.dot.radius) + 'px';
+}
+
+function updateStayInDotDisplay() {
+    const state = gameState.stayInDotGame;
+    
+    document.getElementById('dot-score').textContent = Math.floor(state.score);
+    document.getElementById('dot-highscore').textContent = state.highScore;
+    document.getElementById('dot-status').textContent = state.status;
+}
+
+function resetStayInDotGame() {
+    const state = gameState.stayInDotGame;
+    const dot = document.getElementById('dot-target');
+    const message = document.getElementById('dot-message');
+    
+    state.score = 0;
+    state.isRunning = false;
+    state.status = 'Hover the dot to start';
+    
+    message.textContent = 'Move mouse into the dot to start';
+    dot.classList.remove('running');
+    
+    centerStayInDot();
+    updateStayInDotDisplay();
+}
+
+function stopStayInDotGame() {
+    const state = gameState.stayInDotGame;
+    
+    state.isActive = false;
+    state.isRunning = false;
+    
+    if (state.animationId) {
+        cancelAnimationFrame(state.animationId);
+        state.animationId = null;
+    }
 }
 
 // DVD Logo Bouncer Game Logic

@@ -37,6 +37,12 @@
                         <h3>Progress Bar Filler</h3>
                         <p>Fill progress bars and unlock more. Pure satisfaction.</p>
                     </div>
+
+                    <div class="game-card" onclick="startGame('stay-in-dot')">
+                        <div class="game-icon">🟢</div>
+                        <h3>Stay In The Dot</h3>
+                        <p>Hover in the moving dot and rack up points.</p>
+                    </div>
                     
                     <div class="game-card" onclick="startGame('dvd-bouncer')">
                         <div class="game-icon">📺</div>
@@ -216,6 +222,47 @@
                                 <span class="upgrade-cost">10 completions</span>
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stay In The Dot Game -->
+        <div id="stay-in-dot" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <button class="back-btn" onclick="showMainMenu()">← Back</button>
+                    <h2>Stay In The Dot</h2>
+                </div>
+
+                <div class="dot-game">
+                    <div class="dot-stats">
+                        <div class="stat">
+                            <span class="stat-label">Score:</span>
+                            <span id="dot-score" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Highscore:</span>
+                            <span id="dot-highscore" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Status:</span>
+                            <span id="dot-status" class="stat-value">Hover the dot to start</span>
+                        </div>
+                    </div>
+
+                    <div class="instructions">
+                        <p>Move your mouse into the dot to start. Stay inside as it drifts around to keep scoring!</p>
+                    </div>
+
+                    <div class="dot-game-area" id="dot-game-area">
+                        <div class="dot-target" id="dot-target">
+                            <span id="dot-message" class="dot-message">Move mouse into the dot to start</span>
+                        </div>
+                    </div>
+
+                    <div class="game-controls">
+                        <button class="game-btn" onclick="resetStayInDotGame()">Reset Run</button>
                     </div>
                 </div>
             </div>

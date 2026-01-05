@@ -593,6 +593,70 @@ body {
     text-align: center;
 }
 
+.dot-game {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.dot-stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.dot-game-area {
+    position: relative;
+    width: 800px;
+    height: 500px;
+    margin: 0 auto 30px;
+    background: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 60%),
+                linear-gradient(135deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65));
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dot-target {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #a7ff83, #1dd1a1 60%, #10ac84 100%);
+    box-shadow: 0 0 20px rgba(16, 172, 132, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #0f3d2e;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    padding: 6px;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.dot-target.running {
+    animation: dotPulse 1s ease-in-out infinite;
+    transform: scale(1.02);
+}
+
+.dot-message {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.dot-target.running .dot-message {
+    opacity: 0;
+}
+
+@keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(16, 172, 132, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.6); }
+    50% { box-shadow: 0 0 28px rgba(16, 172, 132, 0.9), inset 0 0 8px rgba(255, 255, 255, 0.6); }
+}
+
 .progress-bar-item.unlocking {
     animation: unlockAnimation 0.8s ease-out;
 }
@@ -772,6 +836,23 @@ body {
     .game-stats {
         flex-direction: column;
         gap: 15px;
+    }
+
+    .dot-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .dot-game-area {
+        width: 100%;
+        max-width: 350px;
+        height: 280px;
+    }
+
+    .dot-target {
+        width: 60px;
+        height: 60px;
+        font-size: 0.5rem;
     }
     
     /* Scale down logo on mobile */
